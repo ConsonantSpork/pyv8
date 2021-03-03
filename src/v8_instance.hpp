@@ -8,13 +8,16 @@
 
 namespace pyv8 {
     class V8Instance {
+        private:
+            std::string catch_exception(v8::TryCatch& try_catch);
+
+        protected:
+            v8::Isolate* isolate;
+            v8::Isolate::CreateParams* create_params;
+
         public:
             V8Instance();
             ~V8Instance();
             std::string run_source(std::string);
-        private:
-            v8::Platform* platform;
-            v8::Isolate* isolate;
-            v8::Isolate::CreateParams* create_params;
     };
 }
