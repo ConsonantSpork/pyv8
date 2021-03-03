@@ -21,6 +21,14 @@ pyv8::V8Instance::~V8Instance() {
     delete this->create_params;
 }
 
+std::string catch_exception(Isolate* isolate, TryCatch& try_catch) {
+    Local<Value> exception = try_catch.Exception();
+    Local<String> msg = Exception::CreateMessage(isolate, exception)->Get();
+    char* buffer = new char[msg->Utf8Length(isolate) + 1];
+    msg->WriteUtf8(isolate, buffer);
+    return buffer;
+}
+
 std::string pyv8::V8Instance::run_source(std::string source) {
     Isolate::Scope isolate_scope(this->isolate);
     HandleScope handle_scope(isolate);
@@ -31,26 +39,25 @@ std::string pyv8::V8Instance::run_source(std::string source) {
         String::NewFromUtf8(this->isolate, source.c_str())
         .ToLocalChecked();
 
+    TryCatch try_catch(isolate);
+
     MaybeLocal<Script> script_dirty =
         Script::Compile(context, v8_source);
     Local<Script> script;
     if (!script_dirty.ToLocal(&script)) {
-        return "Compile time error";
+        return try_catch.HasCaught() ?
+            catch_exception(isolate, try_catch) :
+            "Error running script";
     }
-
-    TryCatch try_catch(isolate);
 
     MaybeLocal<Value> result_dirty = script->Run(context);
     Local<Value> result_checked;
     if(!result_dirty.ToLocal(&result_checked)) {
-        Local<Value> exception = try_catch.Exception();
-        Local<String> msg = Exception::CreateMessage(isolate, exception)->Get();
-        char* buffer = new char[msg->Utf8Length(isolate) + 1];
-        msg->WriteUtf8(isolate, buffer);
-        return buffer;
+        return try_catch.HasCaught() ?
+            catch_exception(isolate, try_catch) :
+            "Error running script";
     }
 
     String::Utf8Value res_str(isolate, result_checked);
-    std::string result(*res_str);
-    return result;
+    return *res_str;
 }
