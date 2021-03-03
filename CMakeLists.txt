@@ -7,7 +7,7 @@ find_package(Threads REQUIRED)
 find_package(Boost)
 
 add_library(v8_instance
-  SHARED
+  STATIC
   src/v8_instance.cpp
   )
 set_target_properties(v8_instance PROPERTIES
