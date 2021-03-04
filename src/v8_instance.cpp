@@ -1,4 +1,3 @@
-#include <iostream>
 #include "v8_instance.hpp"
 
 using namespace v8;

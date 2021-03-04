@@ -2,10 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 
 project(pyv8)
 
+#
+# v8_instance
+#
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 find_package(Boost)
-
 add_library(v8_instance
   STATIC
   src/v8_instance.cpp
@@ -16,6 +19,7 @@ set_target_properties(v8_instance PROPERTIES
 target_include_directories(v8_instance
   PUBLIC
   include
+  src
   )
 target_link_directories(v8_instance
   PUBLIC
@@ -37,6 +41,10 @@ target_link_libraries(v8_instance
   libv8_base_without_compiler.a # FIXME: This is hacky
   )
 
+#
+# pyv8
+#
+
 add_library(pyv8
   SHARED
   src/pyv8.cpp
@@ -56,9 +64,37 @@ set_target_properties(pyv8 PROPERTIES
   PREFIX "_"
   )
 
+#
+# main
+#
+
 add_executable(main
   src/main.cpp
   )
 target_link_libraries(main
   v8_instance
   )
+
+#
+# tests
+#
+
+find_package(GTest)
+if(${GTest_FOUND})
+  add_executable(check
+    tests/main.cpp
+    tests/fixtures.cpp
+    tests/exception_handling.cpp
+    tests/source_execution.cpp
+    )
+  target_include_directories(check
+    PRIVATE
+    src
+    ${GTest_INCLUDE_DIRS}
+    )
+  target_link_libraries(check
+    PRIVATE
+    v8_instance
+    ${GTEST_LIBRARIES}
+    )
+endif()
