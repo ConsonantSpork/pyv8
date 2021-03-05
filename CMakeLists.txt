@@ -12,6 +12,8 @@ find_package(Boost)
 add_library(v8_instance
   STATIC
   src/v8_instance.cpp
+  src/py_converter.cpp
+  src/v8_initializer.cpp
   )
 set_target_properties(v8_instance PROPERTIES
   POSITION_INDEPENDENT_CODE ON
@@ -20,6 +22,7 @@ target_include_directories(v8_instance
   PUBLIC
   include
   src
+  /usr/include/python3.9
   )
 target_link_directories(v8_instance
   PUBLIC
@@ -67,11 +70,14 @@ set_target_properties(pyv8 PROPERTIES
 #
 # main
 #
-
+find_package(PythonLibs 3.9 REQUIRED)
 add_executable(main
   src/main.cpp
   )
 target_link_libraries(main
+  ${Boost_LIBRARIES}
+  boost_python39
+  ${PYTHON_LIBRARIES}
   v8_instance
   )
 
