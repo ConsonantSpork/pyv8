@@ -8,19 +8,27 @@
 #include <boost/python.hpp>
 
 using namespace v8;
+namespace bpy = boost::python;
 
 namespace pyv8 {
     class V8Instance {
         private:
-            std::string catch_exception(TryCatch& try_catch);
-
-        protected:
             Isolate* isolate;
             Isolate::CreateParams* create_params;
+
+            std::string catch_exception(TryCatch&);
+            Local<Value> run_source(std::string, Local<Context>);
 
         public:
             V8Instance();
             ~V8Instance();
-            Local<Value> run_source(std::string);
+            bpy::object py_run_source(std::string);
     };
+
+    template <typename T>
+    bpy::object v8_local_to_py_object(Local<Value>,
+                                      MaybeLocal<T> (Value::*)(Local<Context>) const,
+                                      Local<Context>);
+
+    bpy::object convert(Local<Value>, Local<Context>);
 }

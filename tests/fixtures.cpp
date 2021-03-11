@@ -1,4 +1,3 @@
-#include <iostream>
 #include "fixtures.hpp"
 
 using namespace pyv8_tests;
