@@ -12,6 +12,7 @@ find_package(Boost)
 add_library(v8_instance
   STATIC
   src/v8_instance.cpp
+  src/v8_exception.cpp
   src/v8_initializer.cpp
   )
 set_target_properties(v8_instance PROPERTIES

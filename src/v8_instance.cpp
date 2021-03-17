@@ -1,4 +1,5 @@
 #include "v8_instance.hpp"
+#include "v8_exception.hpp"
 
 using namespace v8;
 
@@ -26,6 +27,14 @@ namespace pyv8 {
         return convert(value, context);
     }
 
+    Local<Value> handle_exception(TryCatch& try_catch, Local<Context> ctx) {
+        if (try_catch.HasCaught()) {
+            throw V8Exception(try_catch, ctx);
+        } else {
+            throw V8Exception("Tried to handle exception but no exception was caught", "undefined", -1, "undefined");
+        }
+    }
+
     Local<Value> V8Instance::run_source(std::string source, Local<Context> context) {
         Local<String> v8_source =
             String::NewFromUtf8(isolate, source.c_str())
@@ -36,19 +45,13 @@ namespace pyv8 {
         MaybeLocal<Script> script_dirty =
             Script::Compile(context, v8_source);
         Local<Script> script;
-        if (!script_dirty.ToLocal(&script)) {
-            return try_catch.HasCaught() ?
-                try_catch.Exception() :
-                Local<Value>();
-        }
+        if (!script_dirty.ToLocal(&script))
+            return handle_exception(try_catch, context);
 
         MaybeLocal<Value> result_dirty = script->Run(context);
         Local<Value> result_checked;
-        if(!result_dirty.ToLocal(&result_checked)) {
-            return try_catch.HasCaught() ?
-                try_catch.Exception() :
-                Local<Value>();
-        }
+        if (!result_dirty.ToLocal(&result_checked))
+            return handle_exception(try_catch, context);
 
         return result_checked;
     }
@@ -127,6 +130,9 @@ namespace pyv8 {
             if (!maybe_obj.ToLocal(&obj))
                 return bpy::object();
             return v8_local_to_py_object(obj, ctx);
+        }
+        else {
+            throw V8Exception("Conversion error", "undefined", -1, "undefined");
         }
     }
 }
