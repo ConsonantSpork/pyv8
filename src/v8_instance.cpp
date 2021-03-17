@@ -103,6 +103,13 @@ namespace pyv8 {
         return bpy::object((std::string)*str_value);
     }
 
+    bpy::object v8_local_to_py_object(Local<BigInt> value, Local<Context> ctx) {
+        String::Utf8Value utf_str(ctx->GetIsolate(), value);
+        std::string str_val = *utf_str;
+        bpy::handle<> handle(PyLong_FromString(str_val.c_str(), NULL, 10));
+        return bpy::object(handle);
+    }
+
     bpy::object convert(Local<Value> value, Local<Context> ctx) {
         if (value->IsBoolean() || value->IsBooleanObject()) {
             bool ret = value->BooleanValue(ctx->GetIsolate());
@@ -122,7 +129,10 @@ namespace pyv8 {
         else if (value->IsString() || value->IsStringObject()) {
             return v8_local_to_py_object(value.As<String>(), ctx);
         }
-        else {  // Interpret as js Object, return as python dict
+        else if (value->IsBigInt()) {
+            return v8_local_to_py_object(value.As<BigInt>(), ctx);
+        }
+        else if (value->IsObject()) {
             MaybeLocal<Object> maybe_obj = Local<Object>::Cast(value);
             auto str = value->TypeOf(ctx->GetIsolate());
             String::Utf8Value str_str(ctx->GetIsolate(), str);
