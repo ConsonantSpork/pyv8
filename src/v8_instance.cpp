@@ -16,7 +16,7 @@ namespace pyv8 {
         delete create_params->array_buffer_allocator;
     }
 
-    bpy::object V8Instance::py_run_source(std::string source) {
+    bpy::object V8Instance::run_source(std::string source) {
         Isolate::Scope isolate_scope(isolate);
         HandleScope handle_scope(isolate);
         Local<Context> context = Context::New(isolate);

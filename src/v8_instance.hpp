@@ -22,7 +22,7 @@ namespace pyv8 {
         public:
             V8Instance();
             ~V8Instance();
-            bpy::object py_run_source(std::string);
+            bpy::object run_source(std::string);
     };
 
     template <typename T>

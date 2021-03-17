@@ -14,9 +14,10 @@ void translate_v8_exception(const pyv8::V8Exception& exc){
 
 BOOST_PYTHON_MODULE(_pyv8)
 {
+  py::object (pyv8::V8Instance::*run_source)(std::string) = &pyv8::V8Instance::run_source;
   py::class_<pyv8::V8Instance>
     ("V8Instance")
-    .def("run_source", &pyv8::V8Instance::py_run_source);
+    .def("run_source", run_source);
 
   py::class_<pyv8::V8Initializer, boost::shared_ptr<pyv8::V8Initializer>, boost::noncopyable>
     ("V8Initializer", py::no_init)
