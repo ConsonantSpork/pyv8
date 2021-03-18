@@ -8,8 +8,25 @@ namespace py = boost::python;
 PyObject* v8_exception_type = nullptr;
 
 void translate_v8_exception(const pyv8::V8Exception& exc){
-  PyObject* message = PyUnicode_FromString(exc.what());
-  PyErr_SetObject(v8_exception_type, message);
+  PyObject* args = Py_BuildValue("ssis",
+                                 exc.msg().c_str(),
+                                 exc.file().c_str(),
+                                 exc.lineno(),
+                                 exc.func().c_str());
+  PyObject* v8_exception_instance = PyObject_Call(v8_exception_type, args, NULL);
+  Py_INCREF(v8_exception_instance);
+
+  PyObject* message = PyUnicode_FromString(exc.msg().c_str());
+  PyObject* file = PyUnicode_FromString(exc.file().c_str());
+  PyObject* lineno = PyLong_FromLong(exc.lineno());
+  PyObject* func = PyUnicode_FromString(exc.func().c_str());
+
+  PyObject_SetAttrString(v8_exception_instance, "message", message);
+  PyObject_SetAttrString(v8_exception_instance, "file", file);
+  PyObject_SetAttrString(v8_exception_instance, "lineno", lineno);
+  PyObject_SetAttrString(v8_exception_instance, "func", func);
+
+  PyErr_SetObject(v8_exception_type, v8_exception_instance);
 }
 
 BOOST_PYTHON_MODULE(_pyv8)
@@ -26,5 +43,7 @@ BOOST_PYTHON_MODULE(_pyv8)
                                            py::return_value_policy<py::reference_existing_object>()));
 
   v8_exception_type = PyErr_NewException("_pyv8.V8Error", PyExc_Exception, NULL);
+  py::scope().attr("V8Error") = py::handle<>(v8_exception_type);
+
   py::register_exception_translator<pyv8::V8Exception>(translate_v8_exception);
 }
