@@ -29,7 +29,9 @@ namespace pyv8 {
 
     Local<Value> handle_exception(TryCatch& try_catch, Local<Context> ctx) {
         if (try_catch.HasCaught()) {
-            throw V8Exception(try_catch, ctx);
+            V8Exception exc(try_catch, ctx);
+            try_catch.Reset();
+            throw exc;
         } else {
             throw V8Exception("Tried to handle exception but no exception was caught", "undefined", -1, "undefined");
         }
