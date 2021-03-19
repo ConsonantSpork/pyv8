@@ -87,20 +87,23 @@ target_link_libraries(main
 
 find_package(GTest)
 if(${GTest_FOUND})
-  add_executable(check
-    tests/main.cpp
-    tests/fixtures.cpp
-    tests/exception_handling.cpp
-    tests/source_execution.cpp
-    )
-  target_include_directories(check
-    PRIVATE
-    src
-    ${GTest_INCLUDE_DIRS}
-    )
-  target_link_libraries(check
-    PRIVATE
-    v8_instance
-    ${GTEST_LIBRARIES}
-    )
+ add_executable(check
+   tests/main.cpp
+   tests/environment.cpp
+   tests/exception_handling.cpp
+   tests/source_execution.cpp
+   )
+ target_include_directories(check
+   PRIVATE
+   src
+   ${GTest_INCLUDE_DIRS}
+   )
+ target_link_libraries(check
+   PRIVATE
+   ${Boost_LIBRARIES}
+   boost_python39
+   ${PYTHON_LIBRARIES}
+   v8_instance
+   ${GTEST_LIBRARIES}
+   )
 endif()

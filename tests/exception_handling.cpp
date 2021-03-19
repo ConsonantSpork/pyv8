@@ -1,15 +1,19 @@
 #include <v8_instance.hpp>
 #include <gtest/gtest.h>
-#include "fixtures.hpp"
+#include "../src/v8_exception.hpp"
 
 namespace pyv8_tests {
-    TEST_F(V8Init, CompiletimeExCaught) {
-        pyv8::V8Instance instance;
-        EXPECT_EQ(instance.run_source("break"), "Uncaught SyntaxError: Illegal break statement");
+    TEST(Exceptions, CompiletimeExCaught) {
+        {
+            pyv8::V8Instance instance;
+            EXPECT_THROW(instance.run_source("break"), pyv8::V8Exception);
+        }
     }
 
-    TEST_F(V8Init, RuntimeExCaught) {
-        pyv8::V8Instance instance;
-        EXPECT_EQ(instance.run_source("variable"), "Uncaught ReferenceError: variable is not defined");
+    TEST(Exceptions, RuntimeExCaught) {
+        {
+            pyv8::V8Instance instance;
+            EXPECT_THROW(instance.run_source("variable"), pyv8::V8Exception);
+        }
     }
 }
