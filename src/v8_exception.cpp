@@ -40,7 +40,7 @@ namespace pyv8 {
 
         v8::String::Utf8Value filename(ctx->GetIsolate(),
                                        message->GetScriptOrigin().ResourceName());
-        set_attributes(exception_str, *filename, message->GetLineNumber(ctx).FromJust(), "unfefined");
+        set_attributes(exception_str, *filename, message->GetLineNumber(ctx).FromJust(), "undefined");
     }
 
     const char* V8Exception::what() const throw() {
