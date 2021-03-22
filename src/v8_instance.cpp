@@ -16,6 +16,10 @@ namespace pyv8 {
         delete create_params->array_buffer_allocator;
     }
 
+    Isolate* V8Instance::get_isolate() const {
+        return isolate;
+    }
+
     bpy::object V8Instance::run_source(std::string source) {
         Isolate::Scope isolate_scope(isolate);
         HandleScope handle_scope(isolate);

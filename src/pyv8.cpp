@@ -2,6 +2,7 @@
 #include "v8_initializer.hpp"
 #include "v8_instance.hpp"
 #include "v8_exception.hpp"
+#include "locker_wrapper.hpp"
 
 namespace py = boost::python;
 
@@ -41,6 +42,11 @@ BOOST_PYTHON_MODULE(_pyv8)
     .def("cleanup", &pyv8::V8Initializer::cleanup)
     .def("get_instance", py::make_function(&pyv8::V8Initializer::getInstance,
                                            py::return_value_policy<py::reference_existing_object>()));
+
+  py::class_<pyv8::LockerWrapper>
+    ("V8Locker", py::init<pyv8::V8Instance&>())
+    .def("__enter__", &pyv8::LockerWrapper::enter)
+    .def("__exit__", &pyv8::LockerWrapper::exit);
 
   v8_exception_type = PyErr_NewException("_pyv8.V8Error", PyExc_Exception, NULL);
   py::scope().attr("V8Error") = py::handle<>(v8_exception_type);

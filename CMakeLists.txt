@@ -14,6 +14,7 @@ add_library(v8_instance
   src/v8_instance.cpp
   src/v8_exception.cpp
   src/v8_initializer.cpp
+  src/locker_wrapper.cpp
   )
 set_target_properties(v8_instance PROPERTIES
   POSITION_INDEPENDENT_CODE ON

@@ -22,6 +22,7 @@ namespace pyv8 {
         public:
             V8Instance();
             ~V8Instance();
+            Isolate* get_isolate() const;
             bpy::object run_source(std::string);
     };
 
