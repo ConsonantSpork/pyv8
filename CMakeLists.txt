@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(pyv8)
+project(pyv8 VERSION 0.1)
 
 #
 # v8_instance
@@ -107,4 +107,16 @@ if(${GTest_FOUND})
    v8_instance
    ${GTEST_LIBRARIES}
    )
+endif()
+
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  set(CMAKE_DOCS_OUTPUT_DIRECTORY doc)
+  configure_file(doc/Doxyfile.in Doxyfile)
+  add_custom_target(doc
+    ALL
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    VERBATIM
+    )
 endif()

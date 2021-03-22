@@ -11,6 +11,14 @@ using namespace v8;
 namespace bpy = boost::python;
 
 namespace pyv8 {
+    /**
+     * \brief Provides methods to run JavaScript code
+     *
+     * Different object of this class can safely be used in different
+     * threads. If you are looking to use the same V8Instance in different
+     * threads, it has to be synchronized using V8Locker (for python) or
+     * v8::Locker (for c++).
+     */
     class V8Instance {
         private:
             Isolate* isolate;
@@ -22,8 +30,18 @@ namespace pyv8 {
         public:
             V8Instance();
             ~V8Instance();
+
+            /** Get v8::Isolate wrapped by this instance */
             Isolate* get_isolate() const;
-            bpy::object run_source(std::string);
+
+            /**
+             * Run JavaScript source string
+             *
+             * @param src JavaScript source to run
+             * @throw V8Exception on compile/runtime JavaScript error
+             * @retuns boost::python::object wrapping result of evaluating src
+             */
+            bpy::object run_source(std::string src);
     };
 
     template <typename T>
