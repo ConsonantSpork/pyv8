@@ -8,7 +8,12 @@
 namespace pyv8_tests {
     class V8Environment : public testing::Environment {
         protected:
-            void SetUp();
-            void TearDown();
+            void SetUp() {
+                Py_Initialize();
+                pyv8::V8Initializer::getInstance();
+            }
+            void TearDown() {
+                pyv8::V8Initializer::getInstance().cleanup();
+            }
     };
 }

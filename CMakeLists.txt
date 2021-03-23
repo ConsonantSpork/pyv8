@@ -90,9 +90,8 @@ find_package(GTest)
 if(${GTest_FOUND})
  add_executable(check
    tests/main.cpp
-   tests/environment.cpp
    tests/exception_handling.cpp
-   tests/source_execution.cpp
+   tests/conversion.cpp
    )
  target_include_directories(check
    PRIVATE
