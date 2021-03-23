@@ -88,17 +88,17 @@ target_link_libraries(main
 
 find_package(GTest)
 if(${GTest_FOUND})
- add_executable(check
+ add_executable(gtest
    tests/main.cpp
    tests/exception_handling.cpp
    tests/conversion.cpp
    )
- target_include_directories(check
+ target_include_directories(gtest
    PRIVATE
    src
    ${GTest_INCLUDE_DIRS}
    )
- target_link_libraries(check
+ target_link_libraries(gtest
    PRIVATE
    ${Boost_LIBRARIES}
    boost_python39
@@ -106,6 +106,9 @@ if(${GTest_FOUND})
    v8_instance
    ${GTEST_LIBRARIES}
    )
+
+ enable_testing()
+ gtest_add_tests(TARGET gtest)
 endif()
 
 find_package(Doxygen)
