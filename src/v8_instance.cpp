@@ -63,9 +63,9 @@ namespace pyv8 {
     }
 
     template <typename T>
-    bpy::object v8_local_to_py_object(Local<Value> value,
-                                      MaybeLocal<T> (Value::*ToType)(Local<Context>) const,
-                                      Local<Context> ctx) {
+    bpy::object V8Instance::v8_local_to_py_object(Local<Value> value,
+                                                  MaybeLocal<T> (Value::*ToType)(Local<Context>) const,
+                                                  Local<Context> ctx) {
         Value* unwrapped = *value;
         MaybeLocal<T> converted = (unwrapped->*ToType)(ctx);
         Local<T> checked;
@@ -75,8 +75,8 @@ namespace pyv8 {
         return bpy::object(checked->Value());
     }
 
-    bpy::object v8_local_to_py_object(Local<Object> value,
-                                      Local<Context> ctx) {
+    bpy::object V8Instance::v8_local_to_py_object(Local<Object> value,
+                                                  Local<Context> ctx) {
         bpy::dict ret;
         MaybeLocal<Array> keys_maybe = value->GetOwnPropertyNames(ctx);
         Local<Array> keys;
@@ -94,8 +94,8 @@ namespace pyv8 {
         return ret;
     }
 
-    bpy::object v8_local_to_py_object(Local<Array> value,
-                                      Local<Context> ctx) {
+    bpy::object V8Instance::v8_local_to_py_object(Local<Array> value,
+                                                  Local<Context> ctx) {
         bpy::list ret;
         for (uint32_t i = 0; i < value->Length(); i++) {
             Local<Value> val = value->Get(ctx, i).ToLocalChecked();
@@ -104,19 +104,19 @@ namespace pyv8 {
         return ret;
     }
 
-    bpy::object v8_local_to_py_object(Local<String> value, Local<Context> ctx) {
+    bpy::object V8Instance::v8_local_to_py_object(Local<String> value, Local<Context> ctx) {
         String::Utf8Value str_value(ctx->GetIsolate(), value);
         return bpy::object((std::string)*str_value);
     }
 
-    bpy::object v8_local_to_py_object(Local<BigInt> value, Local<Context> ctx) {
+    bpy::object V8Instance::v8_local_to_py_object(Local<BigInt> value, Local<Context> ctx) {
         String::Utf8Value utf_str(ctx->GetIsolate(), value);
         std::string str_val = *utf_str;
         bpy::handle<> handle(PyLong_FromString(str_val.c_str(), NULL, 10));
         return bpy::object(handle);
     }
 
-    bpy::object convert(Local<Value> value, Local<Context> ctx) {
+    bpy::object V8Instance::convert(Local<Value> value, Local<Context> ctx) {
         if (value->IsBoolean() || value->IsBooleanObject()) {
             bool ret = value->BooleanValue(ctx->GetIsolate());
             return bpy::object(ret);
