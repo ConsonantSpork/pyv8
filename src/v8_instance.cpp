@@ -9,9 +9,14 @@ namespace pyv8 {
         create_params->array_buffer_allocator =
             ArrayBuffer::Allocator::NewDefaultAllocator();
         this->isolate = Isolate::New(*create_params);
+        v8::HandleScope handle_scope(isolate);
+        this->contexts = new std::vector<Persistent<Context, CopyablePersistentTraits<Context>>>();
+        this->contexts->push_back(Persistent<Context, CopyablePersistentTraits<Context>>(isolate, Context::New(isolate)));
+        this->current_ctx = 0;
     }
 
     V8Instance::~V8Instance() {
+        delete contexts;
         isolate->Dispose();
         delete create_params->array_buffer_allocator;
     }
@@ -20,15 +25,27 @@ namespace pyv8 {
         return isolate;
     }
 
+    size_t V8Instance::create_new_context() {
+        v8::HandleScope handle_scope(isolate);
+        contexts->push_back(Persistent<Context, CopyablePersistentTraits<Context>>(
+                               isolate, Context::New(isolate)));
+        return contexts->size();
+    }
+
+    void V8Instance::set_context(size_t context_id) {
+        current_ctx = context_id;
+    }
+
+    Local<Context> V8Instance::get_current_ctx() {
+        return Local<Context>::New(isolate, contexts->at(current_ctx));
+    }
+
     bpy::object V8Instance::run_source(std::string source) {
         Isolate::Scope isolate_scope(isolate);
         HandleScope handle_scope(isolate);
-        Local<Context> context = Context::New(isolate);
-        Context::Scope context_scope(context);
-
-        Local<Value> value = run_source(source, context);
-
-        return convert(value, context);
+        Context::Scope context_scope(get_current_ctx());
+        Local<Value> value = run_source(source, get_current_ctx());
+        return convert(value, get_current_ctx());
     }
 
     Local<Value> handle_exception(TryCatch& try_catch, Local<Context> ctx) {

@@ -23,6 +23,10 @@ namespace pyv8 {
         private:
             Isolate* isolate;
             Isolate::CreateParams* create_params;
+            std::vector<Persistent<Context, CopyablePersistentTraits<Context>>>* contexts;
+            size_t current_ctx;
+
+            Local<Context> get_current_ctx();
 
             std::string catch_exception(TryCatch&);
             Local<Value> run_source(std::string, Local<Context>);
@@ -52,5 +56,10 @@ namespace pyv8 {
              * @retuns boost::python::object wrapping result of evaluating src
              */
             bpy::object run_source(std::string src);
+
+            size_t create_new_context();
+            void set_context(size_t context_id);
+            bpy::object get_context_ids();
+            bpy::object get_current_ctx_id();
     };
 }
