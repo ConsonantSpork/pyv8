@@ -1,5 +1,6 @@
 #include "v8_instance.hpp"
 #include "v8_exception.hpp"
+#include <chrono>
 
 using namespace v8;
 

@@ -1,6 +1,5 @@
 #include <v8_instance.hpp>
 #include <gtest/gtest.h>
-#include <iostream>
 
 namespace pyv8_tests {
     class V8InstanceFixture : public ::testing::Test {

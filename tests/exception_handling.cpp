@@ -1,7 +1,7 @@
 #include <v8_instance.hpp>
 #include <gtest/gtest.h>
 #include "instance_fixture.hpp"
-#include "../src/v8_exception.hpp"
+#include <v8_exception.hpp>
 
 namespace pyv8_tests {
     class ExceptionHandling : public V8InstanceFixture {};
