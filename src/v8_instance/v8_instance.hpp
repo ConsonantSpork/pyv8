@@ -23,23 +23,27 @@ namespace pyv8 {
         private:
             Isolate* isolate;
             Isolate::CreateParams* create_params;
-            std::vector<Persistent<Context, CopyablePersistentTraits<Context>>>* contexts;
-            size_t current_ctx;
 
-            Local<Context> get_current_ctx();
-
-            std::string catch_exception(TryCatch&);
-            Local<Value> run_source(std::string, Local<Context>);
+            Local<Value> run_source(std::string);
 
             template <typename T>
-            bpy::object v8_local_to_py_object(Local<Value>,
-                                              MaybeLocal<T> (Value::*)(Local<Context>) const,
-                                              Local<Context>);
-            bpy::object v8_local_to_py_object(Local<Object>, Local<Context>);
-            bpy::object v8_local_to_py_object(Local<Array>, Local<Context>);
-            bpy::object v8_local_to_py_object(Local<String>, Local<Context>);
-            bpy::object v8_local_to_py_object(Local<BigInt>, Local<Context>);
-            bpy::object convert(Local<Value>, Local<Context>);
+            bpy::object v8_local_to_py_object(Local<Value> value,
+                                              MaybeLocal<T> (Value::*ToType)(Local<Context>) const) {
+                Value* unwrapped = *value;
+                MaybeLocal<T> converted = (unwrapped->*ToType)(isolate->GetCurrentContext());
+                Local<T> checked;
+                if(!converted.ToLocal(&checked)) {
+                    return bpy::object();
+                }
+                return bpy::object(checked->Value());
+            }
+            bpy::object v8_local_to_py_object(Local<Object>);
+            bpy::object v8_local_to_py_object(Local<Array>);
+            bpy::object v8_local_to_py_object(Local<TypedArray>);
+            bpy::object v8_local_to_py_object(Local<ArrayBuffer>);
+            bpy::object v8_local_to_py_object(Local<String>);
+            bpy::object v8_local_to_py_object(Local<BigInt>);
+            bpy::object convert(Local<Value>);
 
         public:
             V8Instance();
@@ -49,17 +53,25 @@ namespace pyv8 {
             Isolate* get_isolate() const;
 
             /**
-             * Run JavaScript source string
+             * Run JavaScript source string. If there were no previous calls
+             * to V8Instance::new_context, new context will be created and
+             * entered implicitly.
              *
              * @param src JavaScript source to run
              * @throw V8Exception on compile/runtime JavaScript error
-             * @retuns boost::python::object wrapping result of evaluating src
+             * @returns boost::python::object wrapping result of evaluating src
              */
-            bpy::object run_source(std::string src);
+            bpy::object run(std::string src);
 
-            size_t create_new_context();
-            void set_context(size_t context_id);
-            bpy::object get_context_ids();
-            bpy::object get_current_ctx_id();
+            /**
+             * Create and enter new v8::Context. It does not share its global object with previously entered
+             * context(s). You can return to previously entered context by calling V8Instance::exit_context.
+             */
+            void new_context();
+
+            /**
+             * Exit currently entered context and return to prevoius one.
+             */
+            void exit_context();
     };
 }

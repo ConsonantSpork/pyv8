@@ -32,10 +32,12 @@ void translate_v8_exception(const pyv8::V8Exception& exc){
 
 BOOST_PYTHON_MODULE(_pyv8)
 {
-  py::object (pyv8::V8Instance::*run_source)(std::string) = &pyv8::V8Instance::run_source;
+  py::object (pyv8::V8Instance::*run)(std::string) = &pyv8::V8Instance::run;
   py::class_<pyv8::V8Instance>
     ("V8Instance")
-    .def("run_source", run_source);
+    .def("run", run)
+    .def("new_context", &pyv8::V8Instance::new_context)
+    .def("exit_context", &pyv8::V8Instance::exit_context);
 
   py::class_<pyv8::V8Initializer, boost::shared_ptr<pyv8::V8Initializer>, boost::noncopyable>
     ("V8Initializer", py::no_init)

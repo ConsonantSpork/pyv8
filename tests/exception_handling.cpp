@@ -7,10 +7,10 @@ namespace pyv8_tests {
     class ExceptionHandling : public V8InstanceFixture {};
 
     TEST_F(ExceptionHandling, CompiletimeExCaught) {
-        EXPECT_THROW(instance->run_source("break"), pyv8::V8Exception);
+        EXPECT_THROW(instance->run("break"), pyv8::V8Exception);
     }
 
     TEST_F(ExceptionHandling, RuntimeExCaught) {
-        EXPECT_THROW(instance->run_source("variable"), pyv8::V8Exception);
+        EXPECT_THROW(instance->run("variable"), pyv8::V8Exception);
     }
 }
