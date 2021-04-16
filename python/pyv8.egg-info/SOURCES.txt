@@ -1,0 +1,7 @@
+setup.py
+python/pyv8/__init__.py
+python/pyv8.egg-info/PKG-INFO
+python/pyv8.egg-info/SOURCES.txt
+python/pyv8.egg-info/dependency_links.txt
+python/pyv8.egg-info/not-zip-safe
+python/pyv8.egg-info/top_level.txt

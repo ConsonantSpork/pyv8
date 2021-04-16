@@ -9,4 +9,5 @@
 - [ ] Refactor API to closer resemble PyV8
 - [ ] Fix circular references (probably keep a set of Object.GetIdentityHash'es of objects already converted)
 - [ ] Add tests to check for librarires interacting with global object
+- [ ] Fix install error (Run "python setup.py install; pip install .;" to reproduce)
 - [ ] ...
