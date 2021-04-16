@@ -48,7 +48,7 @@ namespace pyv8 {
         TryCatch try_catch(isolate);
 
         MaybeLocal<Script> script_dirty =
-            Script::Compile(isolate->GetEnteredContext(), v8_source);
+            Script::Compile(isolate->GetCurrentContext(), v8_source);
         Local<Script> script;
         if (!script_dirty.ToLocal(&script))
             return handle_exception(try_catch, isolate->GetCurrentContext());
