@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.13)
 project(pyv8 VERSION 0.1)
 
 option(MODULE_ONLY "Build python module only" OFF)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-find_package(PythonLibs 3.9 REQUIRED)
+find_package(Python3 3.7 REQUIRED COMPONENTS Development)
+find_package(Boost REQUIRED COMPONENTS python)
 find_package(GTest)
 find_package(Doxygen)
 

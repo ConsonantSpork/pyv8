@@ -12,11 +12,10 @@ target_include_directories(gtest
   )
 target_link_libraries(gtest
   PRIVATE
-  ${Boost_LIBRARIES}
-  boost_python39
-  ${PYTHON_LIBRARIES}
   v8_instance
+  ${Boost_LIBRARIES}
   ${GTEST_LIBRARIES}
+  ${Python3_LIBRARIES}
   )
 
 enable_testing()

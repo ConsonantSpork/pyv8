@@ -4,14 +4,14 @@ add_library(pyv8
   )
 target_include_directories(pyv8
   PRIVATE
-  /usr/include/python3.9
+  ${Python3_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRECTORIES}
   ${PROJECT_SOURCE_DIR}/src/v8_instance
   )
 target_link_libraries(pyv8
   PRIVATE
   ${Boost_LIBRARIES}
-  boost_python39
+  ${Python3_LIBRARIES}
   v8_instance
   )
 set_target_properties(pyv8 PROPERTIES

@@ -14,7 +14,7 @@ target_include_directories(v8_instance
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/src
-  /usr/include/python3.9
+  ${Python3_INCLUDE_DIRS}
   )
 target_link_directories(v8_instance
   PUBLIC

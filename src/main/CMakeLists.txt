@@ -8,7 +8,7 @@ target_include_directories(main
   )
 target_link_libraries(main
   ${Boost_LIBRARIES}
-  boost_python39
-  ${PYTHON_LIBRARIES}
+  ${Boost_PYTHON_LIBRARIES}
+  ${Python3_LIBRARIES}
   v8_instance
   )
