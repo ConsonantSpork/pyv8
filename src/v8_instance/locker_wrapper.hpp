@@ -30,7 +30,7 @@ namespace pyv8 {
              *
              * @param instance V8Instance object to lock later
              */
-            LockerWrapper(const V8Instance& instance);
+            explicit LockerWrapper(const V8Instance& instance);
 
             /**
              * \brief Enter context manager

@@ -6,6 +6,7 @@
 #include <libplatform/libplatform-export.h>
 #include <libplatform/v8-tracing.h>
 #include <boost/python.hpp>
+#include "circular_reference_tracker.hpp"
 
 using namespace v8;
 namespace bpy = boost::python;
@@ -23,8 +24,11 @@ namespace pyv8 {
         private:
             Isolate* isolate;
             Isolate::CreateParams* create_params;
+            CircularReferenceTracker<bpy::object, int> crt;
 
-            Local<Value> run_source(std::string);
+            Local<Value> run_source(const std::string&);
+
+            int try_get_hash(Local<Value>);
 
             template <typename T>
             bpy::object v8_local_to_py_object(Local<Value> value,
@@ -43,6 +47,7 @@ namespace pyv8 {
             bpy::object v8_local_to_py_object(Local<ArrayBuffer>);
             bpy::object v8_local_to_py_object(Local<String>);
             bpy::object v8_local_to_py_object(Local<BigInt>);
+            bpy::object convert_wrapper(Local<Value>);
             bpy::object convert(Local<Value>);
 
         public:
@@ -61,7 +66,7 @@ namespace pyv8 {
              * @throw V8Exception on compile/runtime JavaScript error
              * @returns boost::python::object wrapping result of evaluating src
              */
-            bpy::object run(std::string src);
+            bpy::object run(const std::string& src);
 
             /**
              * Create and enter new v8::Context. It does not share its global object with previously entered

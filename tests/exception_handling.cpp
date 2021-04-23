@@ -1,4 +1,3 @@
-#include <v8_instance.hpp>
 #include <gtest/gtest.h>
 #include "instance_fixture.hpp"
 #include <v8_exception.hpp>

@@ -1,4 +1,3 @@
-#include <v8_instance.hpp>
 #include <gtest/gtest.h>
 #include <boost/python.hpp>
 #include "instance_fixture.hpp"
