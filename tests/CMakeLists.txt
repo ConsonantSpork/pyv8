@@ -4,6 +4,7 @@ add_executable(gtest
         conversion.cpp
         environment.hpp
         instance_fixture.hpp
+        circular_references.cpp
         )
 get_target_property(V8_INSTANCE_SOURCE_DIR v8_instance SOURCE_DIR)
 target_include_directories(gtest

@@ -27,7 +27,7 @@ namespace pyv8 {
         if (!isolate->InContext())
             new_context();
         Local<Value> value = run_source(source);
-        return convert(value);
+        return convert_wrapper(value);
     }
 
     Local<Value> handle_exception(TryCatch& try_catch, Local<Context> ctx) {
@@ -74,8 +74,15 @@ namespace pyv8 {
         }
     }
 
+
+
     bpy::object V8Instance::v8_local_to_py_object(Local<Object> value) {
+        int hash = value->GetIdentityHash();
+        if (crt.reference_creates_cycle(hash))
+            return crt.get_by_reference(hash);
+
         bpy::dict ret;
+        crt.add_reference(ret, hash);
         MaybeLocal<Array> keys_maybe = value->GetOwnPropertyNames(isolate->GetCurrentContext());
         Local<Array> keys;
         if (!keys_maybe.ToLocal(&keys)) {
@@ -93,7 +100,12 @@ namespace pyv8 {
     }
 
     bpy::object V8Instance::v8_local_to_py_object(Local<Array> value) {
+        int hash = value->GetIdentityHash();
+        if (crt.reference_creates_cycle(hash))
+            return crt.get_by_reference(hash);
+
         bpy::list ret;
+        crt.add_reference(ret, hash);
         for (uint32_t i = 0; i < value->Length(); i++) {
             Local<Value> val = value->Get(isolate->GetCurrentContext(), i).ToLocalChecked();
             ret.append(convert(val));
@@ -102,6 +114,10 @@ namespace pyv8 {
     }
 
     bpy::object V8Instance::v8_local_to_py_object(Local<TypedArray> value) {
+        int hash = value->GetIdentityHash();
+        if (crt.reference_creates_cycle(hash))
+            return crt.get_by_reference(hash);
+
         char* data = new char[value->ByteLength()];
         value->CopyContents(data, value->ByteLength());
         return bpy::object(bpy::handle<>(
@@ -110,11 +126,17 @@ namespace pyv8 {
     }
 
     bpy::object V8Instance::v8_local_to_py_object(Local<ArrayBuffer> value) {
+        int hash = value->GetIdentityHash();
+        if (crt.reference_creates_cycle(hash))
+            return crt.get_by_reference(hash);
+
         auto contents = value->GetContents();
         char* data = static_cast<char*>(contents.Data());
-        return bpy::object(bpy::handle<>(
-                               PyByteArray_FromStringAndSize(data, contents.ByteLength())
-                           ));
+        bpy::object ret = bpy::object(bpy::handle<>(
+                PyByteArray_FromStringAndSize(data, contents.ByteLength())
+        ));
+        crt.add_reference(ret, hash);
+        return ret;
     }
 
     bpy::object V8Instance::v8_local_to_py_object(Local<String> value) {
@@ -130,43 +152,58 @@ namespace pyv8 {
     }
 
     bpy::object V8Instance::convert(Local<Value> value) {
+        bpy::object ret_obj;
         if (value->IsBoolean() || value->IsBooleanObject()) {
             bool ret = value->BooleanValue(isolate);
-            return bpy::object(ret);
+            ret_obj = bpy::object(ret);
         }
         else if (value->IsInt32() || value->IsUint32())
-            return v8_local_to_py_object<v8::Integer>(value, &Value::ToInteger);
+            ret_obj = v8_local_to_py_object<v8::Integer>(value, &Value::ToInteger);
         else if (value->IsNumber()) {
-            return v8_local_to_py_object<v8::Number>(value, &Value::ToNumber);
+            ret_obj = v8_local_to_py_object<v8::Number>(value, &Value::ToNumber);
         }
         else if (value->IsNullOrUndefined()) {
-            return bpy::object();
+            ret_obj = bpy::object();
         }
         else if (value->IsArray()) {
-            return v8_local_to_py_object(value.As<Array>());
+            ret_obj = v8_local_to_py_object(value.As<Array>());
         }
         else if (value->IsString() || value->IsStringObject()) {
-            return v8_local_to_py_object(value.As<String>());
+            ret_obj = v8_local_to_py_object(value.As<String>());
         }
         else if (value->IsTypedArray())
-            return v8_local_to_py_object(value.As<TypedArray>());
+            ret_obj = v8_local_to_py_object(value.As<TypedArray>());
         else if (value->IsArrayBuffer()) {
-            return v8_local_to_py_object(value.As<ArrayBuffer>());
+            ret_obj = v8_local_to_py_object(value.As<ArrayBuffer>());
         }
         else if (value->IsBigInt()) {
-            return v8_local_to_py_object(value.As<BigInt>());
+            ret_obj = v8_local_to_py_object(value.As<BigInt>());
         }
         else if (value->IsObject()) {
             MaybeLocal<Object> maybe_obj = Local<Object>::Cast(value);
-            auto str = value->TypeOf(isolate);
-            String::Utf8Value str_str(isolate, str);
             Local<Object> obj;
             if (!maybe_obj.ToLocal(&obj))
-                return bpy::object();
-            return v8_local_to_py_object(obj);
+                ret_obj = bpy::object();
+            else
+                ret_obj = v8_local_to_py_object(obj);
         }
         else {
             throw V8Exception("Conversion error", "undefined", -1, "undefined");
         }
+        return ret_obj;
+    }
+
+    bpy::object V8Instance::convert_wrapper(Local<Value> value) {
+        bpy::object ret = convert(value);
+        crt.clear();
+        return ret;
+    }
+
+    int V8Instance::try_get_hash(Local<Value> value) {
+        MaybeLocal<Object> maybe_obj = Local<Object>::Cast(value);
+        Local<Object> obj;
+        if (!maybe_obj.ToLocal(&obj))
+            return 0;
+        return obj->GetIdentityHash();
     }
 }
