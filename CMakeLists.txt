@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(pyv8 VERSION 0.1)
+project(pyv8 VERSION 0.1.1)
 
 option(MODULE_ONLY "Build python module only" OFF)
 
