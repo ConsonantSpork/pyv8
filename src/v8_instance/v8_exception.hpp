@@ -15,7 +15,7 @@ namespace pyv8 {
         private:
             std::string msg_;
             std::string file_;
-            int lineno_;
+            int lineno_{};
             std::string func_;
             std::string value;
             void set_attributes(std::string msg, std::string file, int lineno, std::string func);
@@ -36,15 +36,15 @@ namespace pyv8 {
             const char* what() const throw();
 
             /** Get exception message */
-            const std::string msg() const;
+            std::string msg() const;
 
             /** Get name of file where exception was thrown or "undefined" if not known */
-            const std::string file() const;
+            std::string file() const;
 
             /** Get line number where exception was thrown or -1 if not known */
-            const int lineno() const;
+            int lineno() const;
 
             /** Get function name where exception was thrown or "undefined" if not known */
-            const std::string func() const;
+            std::string func() const;
     };
 }

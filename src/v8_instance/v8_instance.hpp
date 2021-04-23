@@ -24,7 +24,7 @@ namespace pyv8 {
             Isolate* isolate;
             Isolate::CreateParams* create_params;
 
-            Local<Value> run_source(std::string);
+            Local<Value> run_source(const std::string&);
 
             template <typename T>
             bpy::object v8_local_to_py_object(Local<Value> value,
@@ -61,7 +61,7 @@ namespace pyv8 {
              * @throw V8Exception on compile/runtime JavaScript error
              * @returns boost::python::object wrapping result of evaluating src
              */
-            bpy::object run(std::string src);
+            bpy::object run(const std::string& src);
 
             /**
              * Create and enter new v8::Context. It does not share its global object with previously entered

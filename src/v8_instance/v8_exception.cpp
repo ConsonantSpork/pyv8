@@ -1,13 +1,15 @@
 #include "v8_exception.hpp"
 
+#include <utility>
+
 using namespace v8;
 
 namespace pyv8 {
     void V8Exception::set_attributes(std::string msg, std::string file, int lineno, std::string func) {
-        msg_ = msg;
-        file_ = file;
+        msg_ = std::move(msg);
+        file_ = std::move(file);
         lineno_ = lineno;
-        func_ = func;
+        func_ = std::move(func);
         std::stringstream ss;
         ss << msg_ << " at line " << lineno_ << " in " << func_ << " in file " << file_;
         value = ss.str();
@@ -15,7 +17,7 @@ namespace pyv8 {
 
     V8Exception::V8Exception(std::string msg, std::string file, int lineno, std::string func)
     {
-        set_attributes(msg, file, lineno, func);
+        set_attributes(std::move(msg), std::move(file), lineno, std::move(func));
     }
 
     std::string get_topmost_function_name(Local<StackTrace> st,
@@ -43,23 +45,23 @@ namespace pyv8 {
         set_attributes(exception_str, *filename, message->GetLineNumber(ctx).FromJust(), "undefined");
     }
 
-    const char* V8Exception::what() const throw() {
+    const char* V8Exception::what() const noexcept {
         return value.c_str();
     }
 
-    const std::string V8Exception::msg() const {
+    std::string V8Exception::msg() const {
         return msg_;
     }
 
-    const std::string V8Exception::file() const {
+    std::string V8Exception::file() const {
         return file_;
     }
 
-    const int V8Exception::lineno() const {
+    int V8Exception::lineno() const {
         return lineno_;
     }
 
-    const std::string V8Exception::func() const {
+    std::string V8Exception::func() const {
         return func_;
     }
 }

@@ -21,7 +21,7 @@ namespace pyv8 {
         return isolate;
     }
 
-    bpy::object V8Instance::run(std::string source) {
+    bpy::object V8Instance::run(const std::string& source) {
         Isolate::Scope isolate_scope(isolate);
         HandleScope handle_scope(isolate);
         if (!isolate->InContext())
@@ -40,7 +40,7 @@ namespace pyv8 {
         }
     }
 
-    Local<Value> V8Instance::run_source(std::string source) {
+    Local<Value> V8Instance::run_source(const std::string& source) {
         Local<String> v8_source =
             String::NewFromUtf8(isolate, source.c_str())
             .ToLocalChecked();

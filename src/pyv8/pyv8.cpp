@@ -32,7 +32,7 @@ void translate_v8_exception(const pyv8::V8Exception& exc){
 
 BOOST_PYTHON_MODULE(_pyv8)
 {
-  py::object (pyv8::V8Instance::*run)(std::string) = &pyv8::V8Instance::run;
+  py::object (pyv8::V8Instance::*run)(const std::string&) = &pyv8::V8Instance::run;
   py::class_<pyv8::V8Instance>
     ("V8Instance")
     .def("run", run)
