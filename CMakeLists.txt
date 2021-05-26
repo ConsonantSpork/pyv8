@@ -5,8 +5,8 @@ option(MODULE_ONLY "Build python module only" OFF)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-find_package(Python3 3.7 REQUIRED COMPONENTS Development)
-find_package(Boost REQUIRED COMPONENTS python)
+find_package(Python3 REQUIRED COMPONENTS Development)
+find_package(Boost REQUIRED COMPONENTS python3)
 find_package(GTest)
 find_package(Doxygen)
 

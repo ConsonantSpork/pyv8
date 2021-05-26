@@ -15,6 +15,7 @@ namespace pyv8 {
     V8Instance::~V8Instance() {
         isolate->Dispose();
         delete create_params->array_buffer_allocator;
+        delete this->create_params;
     }
 
     Isolate* V8Instance::get_isolate() const {
