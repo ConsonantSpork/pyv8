@@ -1,0 +1,25 @@
+From a7b17e0818b0f176a877d3f421b43529aed8947c Mon Sep 17 00:00:00 2001
+From: ConsonantSpork <dimabelov.tu99@gmail.com>
+Date: Fri, 2 Jul 2021 09:06:45 +0300
+Subject: [PATCH] Change component requirement to python
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 80315c2..b9664e5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -6,7 +6,7 @@ option(MODULE_ONLY "Build python module only" OFF)
+ set(THREADS_PREFER_PTHREAD_FLAG ON)
+ 
+ find_package(Python3 REQUIRED COMPONENTS Development)
+-find_package(Boost REQUIRED COMPONENTS python3)
++find_package(Boost REQUIRED COMPONENTS python)
+ find_package(GTest)
+ find_package(Doxygen)
+ 
+-- 
+2.32.0
+
